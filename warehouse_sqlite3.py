@@ -5,7 +5,47 @@ from os import system, name
 
 
 def clear():
+
     system('clear' if name == 'posix' else 'cls')
+
+
+def purchase_order():
+
+    print('\nInput receiving shipment document number.', end='')
+    rec_shipment_doc = str.upper(input(' >>> '))
+
+    print('\nInput vendor name.', end='')
+    vendor = str.title(str.lower(input(' >>> ')))
+
+    clear()
+
+    data_tuple_list = []
+    iterator = 1
+
+    print('{}. part number'.format(iterator), end='')
+    product = str.upper(input(' >>> '))
+    clear()
+
+    print('{}. {} lot'.format(iterator, product), end='')
+    lot = str.upper(input(' >>> '))
+    clear()
+
+    print('{}. {} {} quantity'.format(iterator, product, lot), end='')
+    quantity = int(input(' >>> '))
+    clear()
+
+    print('{}. {} {} {}' .format(iterator, product, lot, quantity))
+
+    location = 'RECEIVING_HUB'
+    # wares have to be trasfered manually after receiving
+
+    data_tuple_list.append((product, quantity, lot, location, vendor,
+                            rec_shipment_doc))
+
+    for data_tuple in data_tuple_list:
+        cursor.execute("INSERT INTO warehouse VALUES (?,?,?,?,?,?)",
+                       data_tuple)
+        connection.commit()
 
 
 def operations_interface():
@@ -25,6 +65,7 @@ other - go back""")
         if ingerence == '1':
             break
         elif ingerence == '2':
+            purchase_order()
             break
         elif ingerence == '3':
             break
@@ -81,6 +122,7 @@ exit -  exit program""")
 
 
 if __name__ == '__main__':
+
     connection = sqlite3.connect('store.db')
 
     cursor = connection.cursor()
@@ -91,17 +133,5 @@ if __name__ == '__main__':
 
     while True:
         main_menu()
-
-    part_number = 'qwer'
-    quantity = 1
-    lot = '000000001'
-    location = '01-01-01'
-    vendor = 'bollocks INC.'
-    rec_shipment_doc = 'WZ001'
-
-    data_tuple = (str.upper(part_number), quantity, lot, location,
-                  str.title(str.lower(vendor)), str.upper(rec_shipment_doc))
-    cursor.execute("INSERT INTO warehouse VALUES (?,?,?,?,?,?)", data_tuple)
-    connection.commit()
 
     connection.close()
