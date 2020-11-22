@@ -25,6 +25,29 @@ def internal_transfer():
     pass
 
 
+def stock_status():
+
+    class Product:
+        def __init__():
+            # self.product
+            # self.quantity
+            # self.data_date
+            # self.location
+            # self.vendor
+            # self.rec_shipment_doc
+            pass
+
+    stock = []
+
+    connection = sqlite3.connect('store.db')
+    cursor = connection.cursor()
+
+    for row in cursor.execute('SELECT * FROM warehouse ORDER BY product'):
+        stock.append(row)
+
+    connection.close()
+
+
 def purchase_order():
     """
     receiving goods function
@@ -126,6 +149,7 @@ other - go back""")
             ingerence = str.strip(input('>>> '))
 
             if ingerence == '1':
+                stock_status()
                 break
             elif ingerence == '2':
                 break
@@ -145,9 +169,9 @@ def main_menu():
         print("""
    1 - operations
    2 - data
-exit -  exit program""")
+exit -  quit program""")
 
-        ingerence = str.strip(input('>>> '))
+        ingerence = str.lower(str.strip(input('>>> ')))
 
         if ingerence == '1':
             operations_interface()
@@ -160,6 +184,9 @@ exit -  exit program""")
 
 
 if __name__ == '__main__':
+
+    print(f"""\nSQLite3 module ver.{sqlite3.version}
+SQLite library ver.{sqlite3.sqlite_version}""")
 
     connection = sqlite3.connect('store.db')
     cursor = connection.cursor()
