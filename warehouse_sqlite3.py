@@ -2,6 +2,14 @@
 import sqlite3
 import sys
 from os import system, name
+from datetime import date
+
+"""
+Main function:
+   * creates storage file if does not exist
+   * runs infinite loop with basic terminal interface as functions tree
+   * at the end of functions tree are called database operation modules
+"""
 
 
 def clear():
@@ -9,43 +17,71 @@ def clear():
     system('clear' if name == 'posix' else 'cls')
 
 
-def purchase_order():
+def make_shipment():
+    pass
 
-    print('\nInput receiving shipment document number.', end='')
-    rec_shipment_doc = str.upper(input(' >>> '))
+
+def internal_transfer():
+    pass
+
+
+def purchase_order():
+    """
+    receiving goods function
+    """
 
     print('\nInput vendor name.', end='')
     vendor = str.title(str.lower(input(' >>> ')))
 
+    print('\nInput receiving shipment document number.', end='')
+    rec_shipment_doc = str.upper(input(' >>> '))
+
     clear()
 
+    location = 'RECEIVING_HUB'  # default value
     data_tuple_list = []
     iterator = 1
+    receiving_showup = ''
+    data_date = date.strftime(date.today(), '%Y.%m.%d')
 
-    print('{}. part number'.format(iterator), end='')
-    product = str.upper(input(' >>> '))
-    clear()
+    while iterator:
 
-    print('{}. {} lot'.format(iterator, product), end='')
-    lot = str.upper(input(' >>> '))
-    clear()
+        print('{}. product name'.format(iterator), end='')
+        product = str.upper(input(' >>> '))
+        clear()
 
-    print('{}. {} {} quantity'.format(iterator, product, lot), end='')
-    quantity = int(input(' >>> '))
-    clear()
+        print('{}. {} quantity'.format(iterator, product), end='')
+        quantity = int(input(' >>> '))
+        clear()
 
-    print('{}. {} {} {}' .format(iterator, product, lot, quantity))
+        receiving_showup += ('{}. {} {}\n'
+                             .format(iterator, product, quantity))
 
-    location = 'RECEIVING_HUB'
-    # wares have to be trasfered manually after receiving
+        print(receiving_showup + '\n\nPress ENTER to continue'
+              "\nType 'END' to submit.\nType 'DEL' to abort.")
+        # print all received goods
 
-    data_tuple_list.append((product, quantity, lot, location, vendor,
-                            rec_shipment_doc))
+        data_tuple_list.append((product, quantity, data_date, location,
+                                vendor, rec_shipment_doc))
+        ingerence = str.strip(str.upper(input(' >>> ')))
 
-    for data_tuple in data_tuple_list:
-        cursor.execute("INSERT INTO warehouse VALUES (?,?,?,?,?,?)",
-                       data_tuple)
-        connection.commit()
+        if ingerence == '':
+            pass
+
+        elif ingerence == 'END':
+
+            connection = sqlite3.connect('store.db')
+            cursor = connection.cursor()
+            cursor.executemany("INSERT INTO warehouse VALUES (?,?,?,?,?,?)",
+                               data_tuple_list)
+            connection.commit()
+            connection.close()
+            break
+
+        elif ingerence == 'DEL':
+            break
+
+        iterator += 1
 
 
 def operations_interface():
@@ -60,14 +96,16 @@ def operations_interface():
     3 - make shipment
 other - go back""")
 
-        ingerence = input('>>> ')
+        ingerence = str.strip(input('>>> '))
 
         if ingerence == '1':
+            internal_transfer()
             break
         elif ingerence == '2':
             purchase_order()
             break
         elif ingerence == '3':
+            make_shipment()
             break
         else:
             break
@@ -85,7 +123,7 @@ def data_interface():
 other - go back""")
 
         while True:
-            ingerence = input('>>> ')
+            ingerence = str.strip(input('>>> '))
 
             if ingerence == '1':
                 break
@@ -109,7 +147,7 @@ def main_menu():
    2 - data
 exit -  exit program""")
 
-        ingerence = input('>>> ')
+        ingerence = str.strip(input('>>> '))
 
         if ingerence == '1':
             operations_interface()
@@ -124,14 +162,11 @@ exit -  exit program""")
 if __name__ == '__main__':
 
     connection = sqlite3.connect('store.db')
-
     cursor = connection.cursor()
-
-    cursor.execute("CREATE TABLE IF NOT EXISTS warehouse \
-        (part_number TEXT PRIMARY KEY, quantity REAL, lot TEXT, \
-        location TEXT, vendor TEXT, shipment_doc TEXT)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS warehouse\
+                   (product TEXT, quantity INTERGER, date TEXT,\
+                    location TEXT, vendor TEXT, shipment_doc TEXT)")
+    connection.close()
 
     while True:
         main_menu()
-
-    connection.close()
