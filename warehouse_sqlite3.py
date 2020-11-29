@@ -41,19 +41,16 @@ def stock_status():
     connection.close()
 
     stock_dict = {}
-    length = 0
 
     for row in stock_tuples:
         if row[0] not in stock_dict.keys():
             stock_dict[row[0]] = row[1]
-            if length < len(row[0]):
-                length = len(row[0])
         else:
             stock_dict[row[0]] += row[1]
 
     print()
     for key in stock_dict:
-        print("{:10s} {:8.0f}" .format(key, stock_dict[key]),
+        print("{:10s} {:8d}" .format(key, stock_dict[key]),
               '\n{}'.format('-' * 19))
 
 
