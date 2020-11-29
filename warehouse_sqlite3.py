@@ -26,31 +26,42 @@ def internal_transfer():
 
 
 def stock_status():
-
-    class Product:
-        def __init__():
-            # self.product
-            # self.quantity
-            # self.data_date
-            # self.location
-            # self.vendor
-            # self.rec_shipment_doc
-            pass
-
-    stock = []
-
+    """
+    -----------------------------------
+    prints total quantitys for products
+    -----------------------------------
+    """
+    stock_tuples = []
     connection = sqlite3.connect('store.db')
     cursor = connection.cursor()
 
     for row in cursor.execute('SELECT * FROM warehouse ORDER BY product'):
-        stock.append(row)
+        stock_tuples.append(row)
 
     connection.close()
+
+    stock_dict = {}
+    length = 0
+
+    for row in stock_tuples:
+        if row[0] not in stock_dict.keys():
+            stock_dict[row[0]] = row[1]
+            if length < len(row[0]):
+                length = len(row[0])
+        else:
+            stock_dict[row[0]] += row[1]
+
+    print()
+    for key in stock_dict:
+        print("{:10s} {:8.0f}" .format(key, stock_dict[key]),
+              '\n{}'.format('-' * 19))
 
 
 def purchase_order():
     """
+    ------------------------
     receiving goods function
+    ------------------------
     """
 
     print('\nInput vendor name.', end='')
@@ -110,7 +121,6 @@ def purchase_order():
 def operations_interface():
 
     while True:
-
         clear()
 
         print("""
@@ -130,15 +140,20 @@ other - go back""")
         elif ingerence == '3':
             make_shipment()
             break
+        elif ingerence == 'exit' or ingerence == 'quit':
+            clear()
+            sys.exit(0)
         else:
             break
 
 
 def data_interface():
 
+    ingerence = ''
     while True:
 
-        clear()
+        if ingerence != '1':
+            clear()
 
         print("""
     1 - stock status
@@ -153,6 +168,9 @@ other - go back""")
                 break
             elif ingerence == '2':
                 break
+            elif ingerence == 'exit' or ingerence == 'quit':
+                clear()
+                sys.exit(0)
             else:
                 break
 
@@ -180,6 +198,7 @@ exit -  quit program""")
             data_interface()
             break
         elif ingerence == 'exit' or ingerence == 'quit':
+            clear()
             sys.exit(0)
 
 
@@ -191,7 +210,7 @@ SQLite library ver.{sqlite3.sqlite_version}""")
     connection = sqlite3.connect('store.db')
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS warehouse\
-                   (product TEXT, quantity INTERGER, date TEXT,\
+                   (product TEXT, quantity INTEGER, date TEXT,\
                     location TEXT, vendor TEXT, shipment_doc TEXT)")
     connection.close()
 
