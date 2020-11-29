@@ -64,11 +64,16 @@ def purchase_order():
     ------------------------
     """
 
-    print('\nInput vendor name.', end='')
-    vendor = str.title(str.lower(input(' >>> ')))
+    vendor = ''
+    rec_shipment_doc = ''
 
-    print('\nInput receiving shipment document number.', end='')
-    rec_shipment_doc = str.upper(input(' >>> '))
+    while vendor == '' or rec_shipment_doc == '':
+
+        print('\nInput vendor name.', end='')
+        vendor = str.title(str.lower(input(' >>> ')))
+
+        print('\nInput receiving shipment document number.', end='')
+        rec_shipment_doc = str.upper(input(' >>> '))
 
     clear()
 
@@ -80,23 +85,44 @@ def purchase_order():
 
     while iterator:
 
+        error = False
+
         print('{}. product name'.format(iterator), end='')
         product = str.upper(input(' >>> '))
+        if product == '':
+            error = True
+
         clear()
 
         print('{}. {} quantity'.format(iterator, product), end='')
-        quantity = int(input(' >>> '))
+        try:
+            quantity = int(input(' >>> '))
+        except ValueError:
+            error = True
+            quantity = 0
+
         clear()
 
-        receiving_showup += ('{}. {} {}\n'
-                             .format(iterator, product, quantity))
+        if error is False:
+            receiving_showup += ('\n{}. {} {}'
+                                 .format(iterator, product, quantity))
 
-        print(receiving_showup + '\n\nPress ENTER to continue'
+        print(receiving_showup)
+
+        if error is True:
+            print('X. {} {}   Ooops! Something is missing. Try again'
+                  .format(product, quantity))
+            iterator -= 1
+
+        print('\n\nPress ENTER to continue'
               "\nType 'END' to submit.\nType 'DEL' to abort.")
+
         # print all received goods
 
-        data_tuple_list.append((product, quantity, data_date, location,
-                                vendor, rec_shipment_doc))
+        if error is False:
+            data_tuple_list.append((product, quantity, data_date, location,
+                                    vendor, rec_shipment_doc))
+
         ingerence = str.strip(str.upper(input(' >>> ')))
 
         if ingerence == '':
@@ -115,6 +141,7 @@ def purchase_order():
         elif ingerence == 'DEL':
             break
 
+        clear()
         iterator += 1
 
 
